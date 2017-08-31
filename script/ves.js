@@ -1,4 +1,5 @@
 //Ves v2.0 Copyright Â© 2014-2017 Chen QingZhu TEl: 13760888450 All rights reserved.
+/*ves.js框架的说明文档：页面加载(ves.doc.js)后，通过浏览器的控制台输入vesInfo，或者vesInfo.addClass的方式可查看详细说明文档*/
 (function() {
 
 	var $data = {
@@ -34,7 +35,7 @@
 
 	$.version = 2.00;
 
-	ves.ready = function(fun) {
+	ves.ready = function (fun) {
 		if(typeof(fun) == 'function') ves(fun);
 	};
 
@@ -103,6 +104,7 @@
 		}
 		this.length = this.$.length;
 	}
+
 	init.prototype = {
 		parent: function() {
 			var arr = [];
@@ -114,34 +116,67 @@
 		},
 		parents: function(slt) {
 			var arr = [];
-			for(var i = 0; i < this.$.length; i++) {
-				(function() {
-					if(this.parentNode && this.tagName.toLowerCase() != 'html') {
-						arr.push(this.parentNode);
-						arguments.callee.call(this.parentNode);
-					}
-				}).call(this.$[i]);
+			if (typeof (slt) == 'number') {
+				var index;
+				for (var i = 0; i < this.$.length; i++) {
+					index =-1;
+					(function () {
+						if (this.parentNode && this.tagName.toLowerCase() != 'html') {
+							++index;
+							if (index === slt) {
+								arr.push(this.parentNode);
+								return;
+							}
+							arguments.callee.call(this.parentNode);
+						}
+					}).call(this.$[i]);
+				}
 			}
-			if(typeof(slt) == 'string') arr = filter(slt, arr);
-			else if(typeof(slt) == 'number') {
-				if(slt > arr.length - 1) arr = [];
-				else arr = arr.unique()[slt];
+			else {
+				for (var i = 0; i < this.$.length; i++) {
+					(function () {
+						if (this.parentNode && this.tagName.toLowerCase() != 'html') {
+							arr.push(this.parentNode);
+							arguments.callee.call(this.parentNode);
+						}
+					}).call(this.$[i]);
+				}
 			}
+			if (typeof (slt) == 'string') arr = filter(slt, arr);
+
 			return new init(arr);
 		},
 		children: function(slt) {
 			var arr = [];
 			var _arr;
-			for(var c = 0; c < this.$.length; c++) {
-				_arr = this.$[c].childNodes;
-				for(var i = 0; i < _arr.length; i++) {
-					if(_arr[i].nodeType === 1 || _arr[i].nodeType === 11) arr.push(_arr[i]);
+			if (typeof (slt) == 'number') {
+				var index;
+				for (var c = 0; c < this.$.length; c++) {
+					index = -1;
+					_arr = this.$[c].childNodes;
+					for (var i = 0; i < _arr.length; i++) {
+						if (_arr[i].nodeType === 1 || _arr[i].nodeType === 11) {
+							++index;
+							if (index === slt) {
+								arr.push(_arr[i]);
+								break;
+							}
+						}
+					}
+				}
+			}
+			else {
+				for (var c = 0; c < this.$.length; c++) {
+					_arr = this.$[c].childNodes;
+					for (var i = 0; i < _arr.length; i++) {
+						if (_arr[i].nodeType === 1 || _arr[i].nodeType === 11) arr.push(_arr[i]);
+					}
 				}
 			}
 			if(typeof(slt) == 'string') arr = filter(slt, arr);
-			else if(typeof(slt) == 'number') arr = arr.unique()[slt];
 			return new init(arr);
 		},
+
 		find: function(slt) {
 			return new init(selector(slt, this.$));
 		},
@@ -1488,6 +1523,7 @@
 			else if(prt.$ instanceof Array) prt = prt.$;
 			else if(prt.nodeType === 1 || prt.nodeType === 11 || prt.window || prt.documentElement) prt = [prt];
 		}
+		if (!slt) return prt;
 		var a1 = slt.split(/,/gi),
 			a2, a3, a4, a5, a6, a7, k, f, tag, check, g;
 		var dom = [],
@@ -1696,6 +1732,7 @@
 	}
 
 	function filter(slt, arr) {
+		if (!slt) return arr;
 		var a1 = slt.split(/,/gi),
 			a2, a3, a5, a6, a7, k, f, tag, check;
 		for(var i = 0; i < a1.length; i++) {
