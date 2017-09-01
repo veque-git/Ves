@@ -1,5 +1,5 @@
 //Ves v2.0 Copyright Â© 2014-2017 Chen QingZhu TEl: 13760888450 All rights reserved.
-/*ves.js框架的说明文档：页面加载(ves.doc.js)后，通过浏览器的控制台输入vesInfo，或者vesInfo.addClass的方式可查看详细说明文档*/
+//以下注释说明：参数>1表示必须传参，参数>0表示可不传
 (function() {
 
 	var $data = {
@@ -8,6 +8,12 @@
 		isReady: false,
 		isLoaded: false
 	};
+
+	//slt>1(string, HTMLElement, ves, function)选择器字符串/element/ves对象, 或者函数（document文档准备好后回调函数）
+	//prt>0(HTMLElement)父级元素
+	//callback>0(function)如果获得的元素里面有未执行的js代码，执行前调用
+	//callback2>0(function)如果获得的元素里面有未执行的js代码，执行后调用
+	//return>返回ves对象，当第一个参数为function时除外
 	window.ves = function(slt, prt, callback, callback2) {
 		if(typeof(slt) == 'function') {
 			if($data.isReady) {
@@ -33,12 +39,16 @@
 
 	var $ = ves;
 
+	//ves版本号
 	$.version = 2.00;
 
+	//简捷调用方式：ves(function(){})
+	//fun>1(function)document文档准备好后回调函数
 	ves.ready = function (fun) {
 		if(typeof(fun) == 'function') ves(fun);
 	};
 
+	//fun>1(function)document文档准备好并且html全部图片加载完成后回调
 	ves.loaded = function(fun) {
 		if(typeof(fun) == 'function') {
 			if($data.isLoaded) {
@@ -68,6 +78,11 @@
 		}
 	};
 
+	//ves构造函数
+	//slt>1(string, HTMLElement, ves, function)选择器字符串/element/ves对象, 或者函数（document文档准备好后回调函数）
+	//prt>0(HTMLElement)父级元素
+	//callback>0(function)如果获得的元素里面有未执行的js代码，执行前调用
+	//callback2>0(function)如果获得的元素里面有未执行的js代码，执行后调用
 	function init(slt, prt, callback, callback2) {
 		this.$ = [];
 		if(slt) {
@@ -106,6 +121,8 @@
 	}
 
 	init.prototype = {
+
+		//return>this的一级父级元素的ves对象
 		parent: function() {
 			var arr = [];
 			for(var i = 0; i < this.$.length; i++) {
@@ -114,6 +131,9 @@
 			}
 			return new init(arr);
 		},
+
+		//slt>0(string, number)选择器字符串，或者数字序号（第几个父级元素）
+		//return>this所有元素的所有父级元素的ves对象
 		parents: function(slt) {
 			var arr = [];
 			if (typeof (slt) == 'number') {
@@ -142,10 +162,14 @@
 					}).call(this.$[i]);
 				}
 			}
+			arr = arr.unique();
 			if (typeof (slt) == 'string') arr = filter(slt, arr);
 
 			return new init(arr);
 		},
+
+		//slt>0(string, number)选择器字符串，或者数字序号（第几个子级元素）
+		//return>this的所有第一级子级元素的ves对象
 		children: function(slt) {
 			var arr = [];
 			var _arr;
@@ -177,19 +201,26 @@
 			return new init(arr);
 		},
 
+		//slt>1(string)选择器字符串
+		//return>this所有元素下的所有子级元素的ves对象
 		find: function(slt) {
 			return new init(selector(slt, this.$));
 		},
+
+		//slt>1(string)选择器字符串
+		//return>过滤后返回符合条件的this所有元素的ves对象
 		filter: function(slt) {
 			return new init(filter(slt, this.$));
 		},
-		siblings: function(slt) {
-			var parent = this.parent();
-			var arr = parent.children().$.remove(this.$);
-			if(typeof(slt) == 'string') arr = filter(slt, arr);
-			else if(typeof(slt) == 'number') arr = arr.unique()[slt];
+
+		//slt>0(string, number)选择器字符串,或者数字序号(第几个同级元素)
+		//return>this所有同级元素
+		siblings: function (slt) {
+			var arr = this.parent().children(slt).$.remove(this.$);
 			return new init(arr);
 		},
+
+		//return>this的后一个同级元素
 		next: function() {
 			var arr = [];
 			for(var i = 0; i < this.$.length; i++) {
@@ -205,22 +236,47 @@
 			}
 			return new init(arr);
 		},
+
+		//slt>0(string, number)选择器字符串,或者数字序号(后面第几个同级元素)
+		//return>this后面的所有同级元素
 		nexts: function(slt) {
 			var arr = [];
-			for(var i = 0; i < this.$.length; i++) {
-				if(this.$[i].nextSibling) {
-					(function() {
-						if(this.nodeType === 1 || this.nodeType === 11) {
-							arr.push(this);
-						}
-						if(this.nextSibling) arguments.callee.call(this.nextSibling);
-					}).call(this.$[i].nextSibling);
+			if (typeof (slt) == 'number') {
+				var index;
+				for (var i = 0; i < this.$.length; i++) {
+					index = -1;
+					if (this.$[i].nextSibling) {
+						(function () {
+							if (this.nodeType === 1 || this.nodeType === 11) {
+								++index;
+								if (index === slt) {
+									arr.push(this);
+									return;
+								}
+							}
+							if (this.nextSibling) arguments.callee.call(this.nextSibling);
+						}).call(this.$[i].nextSibling);
+					}
 				}
 			}
+			else {
+				for (var i = 0; i < this.$.length; i++) {
+					if (this.$[i].nextSibling) {
+						(function () {
+							if (this.nodeType === 1 || this.nodeType === 11) {
+								arr.push(this);
+							}
+							if (this.nextSibling) arguments.callee.call(this.nextSibling);
+						}).call(this.$[i].nextSibling);
+					}
+				}
+			}
+			arr = arr.unique();
 			if(typeof(slt) == 'string') arr = filter(slt, arr);
-			else if(typeof(slt) == 'number') arr = arr.unique()[slt];
 			return new init(arr);
 		},
+
+		//return>this的前一个同级元素
 		prev: function() {
 			var arr = [];
 			for(var i = 0; i < this.$.length; i++) {
@@ -236,22 +292,47 @@
 			}
 			return new init(arr);
 		},
+
+		//slt>0(string, number)选择器字符串,或者数字序号(前面第几个同级元素)
+		//return>this前面的所有同级元素
 		prevs: function(slt) {
 			var arr = [];
-			for(var i = 0; i < this.$.length; i++) {
-				if(this.$[i].previousSibling) {
-					(function() {
-						if(this.nodeType === 1 || this.nodeType === 11) {
-							arr.push(this);
-						}
-						if(this.previousSibling) arguments.callee.call(this.previousSibling);
-					}).call(this.$[i].previousSibling);
+			if (typeof (slt) == 'number') {
+				var index;
+				for (var i = 0; i < this.$.length; i++) {
+					index = -1;
+					if (this.$[i].previousSibling) {
+						(function () {
+							if (this.nodeType === 1 || this.nodeType === 11) {
+								++index;
+								if (index === slt) {
+									arr.push(this);
+									return;
+								}
+							}
+							if (this.previousSibling) arguments.callee.call(this.previousSibling);
+						}).call(this.$[i].previousSibling);
+					}
 				}
 			}
+			else {
+				for (var i = 0; i < this.$.length; i++) {
+					if (this.$[i].previousSibling) {
+						(function () {
+							if (this.nodeType === 1 || this.nodeType === 11) {
+								arr.push(this);
+							}
+							if (this.previousSibling) arguments.callee.call(this.previousSibling);
+						}).call(this.$[i].previousSibling);
+					}
+				}
+			}
+			arr = arr.unique();
 			if(typeof(slt) == 'string') arr = filter(slt, arr);
-			else if(typeof(slt) == 'number') arr = arr.unique()[slt];
 			return new init(arr);
 		},
+
+		//return>this[0]的序号
 		index: function() {
 			var s = this.parent().children().$;
 			for(var c = 0; c < s.length; c++) {
@@ -260,6 +341,9 @@
 			}
 			return -1;
 		},
+		
+		//num>1(number,string,array)
+		//return>返回this第几个元素
 		eq: function(num) {
 			var arr = [];
 			if(this.$.length == 0) return new init(arr);
@@ -274,21 +358,36 @@
 			}
 			return new init(arr);
 		},
+		
+		//num>1(number)
+		//return>返回序号<=num的元素
 		lt: function(num) {
 			if(num > this.$.length - 1) num = this.$.length - 1;
-			return new init(this.$.slice(0, num));
+			return new init(this.$.slice(0, num+1));
 		},
+
+		//num>1(number)
+		//return>返回序号>=num的元素
 		gt: function(num) {
 			if(num > this.$.length - 1) num = this.$.length - 1;
 			return new init(this.$.slice(num));
 		},
+
+		//num>1(string)选择器
+		//return>排除选择器指定的元素
 		not: function(slt) {
 			return new init(this.$.remove(selector(slt)));
 		},
+
+		//num>1(string)选择器
+		//return>判断this是否是slt选择器指定的元素
 		is: function(slt) {
 			if(selector(slt).contains(this.$)) return true;
 			return false;
 		},
+		
+		//dom>1(HTMLElement, Array)
+		//return>判断this是否包含dom
 		contains: function(dom) {
 			var it = this.$[0];
 			var valid = false;
@@ -321,6 +420,10 @@
 			}
 			return valid;
 		},
+		
+		//fun>1(function)
+		//context>0(object)设置调用fun的this指针，如果未设置，默认为当前element
+		//return>ves对象，对this中每个element执行fun函数
 		each: function(fun, context) {
 			for(var i = 0; i < this.$.length; i++) {
 				if(fun.call(context || this.$[i], i, this.$[i]) == false)
@@ -328,6 +431,11 @@
 			}
 			return this;
 		},
+		
+		//key>1(string, object)
+		//value>0(string,funciton)
+		//relative>0(boolean)
+		//获取或者设置元素的css样式
 		css: function(key, value, relative) {
 			var val, val2;
 			if(typeof(key) == 'object') {
@@ -397,6 +505,10 @@
 			}
 			return this;
 		},
+		
+		//key>1(string, object)
+		//value>0(string,funciton)
+		//获取或者设置元素的html属性
 		attr: function(key, value) {
 			if(typeof(key) == 'object') {
 				for(var i = 0; i < this.$.length; i++) {
@@ -446,6 +558,10 @@
 			}
 			return this;
 		},
+
+		//key>1(string, object)
+		//value>0(string,funciton)
+		//获取或者设置元素的内置属性
 		_attr: function(key, value) {
 			if(typeof(key) == 'object') {
 				for(var i = 0; i < this.$.length; i++) {
