@@ -1,7 +1,5 @@
 # Ves
-<<<<<<< HEAD
-Ves.js is a js library similar to jquery,   but more streamlined and more practical features.
-=======
+
 > Ves.js是原生js框架，语法类似于jQuery，但Ves更精简，而且很多功能优于jQuery，并且提供了很多特有的实用功能：
 
 ``` javascript
@@ -52,5 +50,3 @@ ready(文档准备好),mobile(移动端),desktop(桌面端),
 webkit(浏览器内核), ms7(ie7), ms-8(ie6-ie8)，......等等其他特性-->
 <html class="ready mobile webkit">
 ```
-
->>>>>>> develop
