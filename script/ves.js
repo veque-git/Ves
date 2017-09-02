@@ -609,6 +609,10 @@
 			}
 			return this;
 		},
+		
+		//value>0(string,number)
+		//relative>0(boolean)相对于当前值增减值
+		//return>当未指定value时返回this高度，当指定value时设置this高度
 		height: function(value, relative) {
 			if(!value && value != 0) {
 				if(this.$.length == 0) return -1;
@@ -622,6 +626,10 @@
 			this.css('height', value, relative);
 			return this;
 		},
+
+		//value>0(string,number)
+		//relative>0(boolean)相对于当前值增减值
+		//return>当未指定value时返回this宽度，当指定value时设置this宽度
 		width: function(value, relative) {
 			if(!value && value != 0) {
 				if(this.$.length == 0) return -1;
@@ -635,6 +643,8 @@
 			this.css('width', value, relative);
 			return this;
 		},
+		
+		//显示this
 		show: function() {
 			for(var i = 0; i < this.$.length; i++) {
 				if(getStyle(this.$[i], 'display') == 'none') {
@@ -645,6 +655,8 @@
 			}
 			return this;
 		},
+
+		//隐藏this
 		hide: function() {
 			for(var i = 0; i < this.$.length; i++) {
 				if(getStyle(this.$[i], 'display') != 'none') {
