@@ -666,10 +666,13 @@
 			}
 			return this;
 		},
+		
+		//添加className
+		//name>1(string, array)
 		addClass: function(name) {
 			if(this.$.length==0)return this;
 			var _name;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				_name = this.$[i].className.split(/[\s]+/g);
 				this.$[i].className = _name.union(name).join(' ').trim();
@@ -679,7 +682,7 @@
 		removeClass: function(name) {
 			if(this.$.length==0)return this;
 			var _name;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				_name = this.$[i].className.split(/[\s]+/g);
 				this.$[i].className = _name.remove(name).join(' ').trim();
@@ -690,7 +693,7 @@
 		toggleClass: function(name) {
 			if(this.$.length==0)return this;
 			var _name;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				_name = this.$[i].className.split(/[\s]+/g);
 				this.$[i].className = _name.remove(name).union(name.remove(_name)).join(' ').trim();
@@ -700,7 +703,7 @@
 		},
 		hasAttr: function(name) {
 			if(this.$.length==0)return false;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				for(var c = 0; c < name.length; c++) {
 					if(typeof(this.$[i].getAttribute(name[c]) || this.$[i][name[c]]) == 'undefined')
@@ -711,7 +714,7 @@
 		},
 		noAttr: function(name) {
 			if(this.$.length==0)return false;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				for(var c = 0; c < name.length; c++) {
 					if(typeof(this.$[i].getAttribute(name[c]) || this.$[i][name[c]]) != 'undefined')
@@ -722,7 +725,7 @@
 		},
 		hasClass: function(name) {
 			if(this.$.length==0)return false;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				for(var c = 0; c < name.length; c++) {
 					if(this.$[i].className.split(/[\s]+/g).contains(name[c]) == false)
@@ -733,7 +736,7 @@
 		},
 		noClass: function(name) {
 			if(this.$.length==0)return false;
-			if(name instanceof Array == false) name = name.split(/[,\s\|][\s]*/gi);
+			if(typeof(name)=='string') name = name.split(/[,\s\|][\s]*/gi);
 			for(var i = 0; i < this.$.length; i++) {
 				for(var c = 0; c < name.length; c++) {
 					if(this.$[i].className.split(/[\s]+/g).contains(name[c]))
@@ -937,12 +940,21 @@
 			}
 			return true;
 		},
-		getPageRect: function() {
-			var rect = {
+		pageRect: function() {
+			var rect;
+			if(this.$[0].getBoundingClientRect){
+				var docE=this.$[0].ownerDocument.documentElement;
+				rect=this.$[0].getBoundingClientRect();
+				return {
+					left: rect.left.toFixed(1)-0+docE.scrollLeft,
+					top: rect.top.toFixed(1)-0+docE.scrollTop
+				};
+			}
+			rect = {
 				left: 0,
 				top: 0
 			};
-			! function(it) {
+			!function(it) {
 				rect.left += it.offsetLeft;
 				rect.top += it.offsetTop;
 				if(it.offsetParent)
@@ -1157,17 +1169,44 @@
 		else{
 			HTMLElement.prototype[_name]=value;
 		}
-		return _name;
+
+		if(typeof(HTMLCollection) != 'undefined'){
+			_name=name;
+			if(name in HTMLCollection.prototype)_name+='V';
+			if(typeof(value)=='function'){
+				HTMLCollection.prototype[_name]=function(){
+					this.$=nodeListToArray(this);
+					return value.apply(this, arguments);
+				};
+			}
+			else{
+				HTMLCollection.prototype[_name]=value;
+			}
+		}
+
+		if(typeof(NodeList) != 'undefined'){
+			_name=name;
+			if(name in NodeList.prototype)_name+='V';
+			if(typeof(value)=='function'){
+				NodeList.prototype[_name]=function(){
+					this.$=nodeListToArray(this);
+					return value.apply(this, arguments);
+				};
+			}
+			else{
+				NodeList.prototype[_name]=value;
+			}
+		}
 	};
 
 	for(var n in init.prototype){
 		extendHTMLElement(n,init.prototype[n]);
 	}
 
-
 	$.extendPrototype = function(name, value) {
 		if(name in init.prototype)return false;
 		init.prototype[name] = value;
+		extendHTMLElement(name,value);
 		return true;
 	};
 
