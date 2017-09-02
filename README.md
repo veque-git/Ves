@@ -66,16 +66,21 @@ Ves.js是原生js框架，语法类似于jQuery，但Ves更精简，而且很多
 		//解绑事件处理程序，用off或者unbind
 		element.off('tap', /*function || undefined*/);
 
-		/*Other functional documentation of ves will also be presented to you soon. We hope to get positive feedback from all walks of life.*/
+		/*Other functional documentation of ves will also be presented to you soon.
+		We hope to get positive feedback from all walks of life.*/
 		/*ves其他功能说明文档也将会很快呈现给大家。希望能够得到大家各方面的积极反馈！*/
 	});
 
 })();
 ```
 ``` html
-<!--调用ves.js后，html节点会自动添加以下className，
-方便用css控制不同浏览器状态下的样式：
-ready(文档准备好),mobile(移动端),desktop(桌面端),
-webkit(浏览器内核), ms7(ie7), ms-8(ie6-ie8)，......等等其他特性-->
 <html class="ready mobile webkit">
+<!--After calling ves.js, the HTML node automatically adds the following className,
+Ready (document ready), mobile (mobile terminal), desktop (desktop end),
+WebKit (browser kernel), MS7 (IE7), ms-8 (ie6-ie8), etc., and other features.
+It's convenient to control styles in different browser states with css.-->
+<!--调用ves.js后，html节点会自动添加以下className，
+ready(文档准备好),mobile(移动端),desktop(桌面端),
+webkit(浏览器内核), ms7(ie7), ms-8(ie6-ie8)，......等等其他特性
+方便用css控制不同浏览器状态下的样式.-->
 ```
