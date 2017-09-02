@@ -1,7 +1,7 @@
 # Ves.js
 
-> Ves.js is native JS framework, syntax similar to jQuery, but Ves is more streamlined, and many functions better than jQuery, and provides many unique practical functions:
-> Ves.js是原生js框架，语法类似于jQuery，但Ves更精简，而且很多功能优于jQuery，并且提供了很多特有的实用功能：
+> Ves.js is native JS framework, syntax similar to jQuery, but Ves is more streamlined, and many functions better than jQuery, and provides many unique practical functions:<br />
+Ves.js是原生js框架，语法类似于jQuery，但Ves更精简，而且很多功能优于jQuery，并且提供了很多特有的实用功能：
 
 ``` javascript
 (function(){
