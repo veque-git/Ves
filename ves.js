@@ -905,7 +905,10 @@
 			for(var i = 0; i < this.$.length; i++) {
 				if(this.$[i].parentNode)
 					this.$[i].parentNode.removeChild(this.$[i]);
+				delete this[i];
 			}
+			this.$=[];
+			return this;
 		},
 		appear: function(relative, client) {
 			if(this.$.length == 0) return false;
@@ -1162,7 +1165,8 @@
 		if(name in HTMLElement.prototype)_name+='V';
 		if(typeof(value)=='function'){
 			HTMLElement.prototype[_name]=function(){
-				this.$=[this];
+				if((this.$ instanceof Array)==false)
+					this.$=[this];
 				return value.apply(this, arguments);
 			};
 		}
@@ -1175,7 +1179,8 @@
 			if(name in HTMLCollection.prototype)_name+='V';
 			if(typeof(value)=='function'){
 				HTMLCollection.prototype[_name]=function(){
-					this.$=nodeListToArray(this);
+					if((this.$ instanceof Array)==false)
+						this.$=nodeListToArray(this);
 					return value.apply(this, arguments);
 				};
 			}
@@ -1189,7 +1194,8 @@
 			if(name in NodeList.prototype)_name+='V';
 			if(typeof(value)=='function'){
 				NodeList.prototype[_name]=function(){
-					this.$=nodeListToArray(this);
+					if((this.$ instanceof Array)==false)
+						this.$=nodeListToArray(this);
 					return value.apply(this, arguments);
 				};
 			}
